@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  jenkins:
+    image: jenkins/jenkins:lts  # 안정적인 최신 버전 이미지를 가져옴
+    container_name: my-jenkins  # 컨테이너 이름 설정
+    user: root                  # 권한 문제 방지를 위해 root로 실행
+    ports:
+      - "8080:8080"             # 왼쪽은 내 컴퓨터 포트, 오른쪽은 컨테이너 포트
+      - "50000:50000"           # Agent 연결용 포트
+    volumes:
+      - ./jenkins_home:/var/jenkins_home          # 젠킨스 데이터를 내 폴더와 연동 (중요!)
+      - /var/run/docker.sock:/var/run/docker.sock # 젠킨스 안에서 도커를 쓰기 위한 설정
+    restart: always             # 컴터를 껐다 켜도 자동으로 다시 실행
