@@ -8,10 +8,12 @@ pipeline {
         }
         stage('Step 2: 웹 서버 실행 (Docker)') {
             steps {
-                echo '기존 웹 서버가 있다면 끄고, 새로 실행합니다...'
-                // 기존에 돌고 있는 nginx가 있으면 끄고 새로 띄우는 명령어입니다.
+                echo '기존 웹 서버 제거...'
                 sh 'docker rm -f my-web-server || true'
-                sh 'docker run -d --name my-web-server -p 8081:80 -v $(pwd):/usr/share/nginx/html nginx'
+                
+                echo '새로운 웹 서버 실행...'
+                // -v 옵션 부분을 아래와 같이 '현재 작업 폴더'를 명확히 가리키도록 수정합니다.
+                sh "docker run -d --name my-web-server -p 8081:80 -v ${WORKSPACE}:/usr/share/nginx/html nginx"
             }
         }
         stage('Step 3: 배포 완료 확인') {
