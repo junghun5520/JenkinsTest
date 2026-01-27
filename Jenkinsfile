@@ -8,12 +8,18 @@ pipeline {
         }
         stage('Step 2: 웹 서버 실행 (Docker)') {
             steps {
-                echo '기존 웹 서버 제거...'
+                echo '1. 기존 웹 서버 제거'
                 sh 'docker rm -f my-web-server || true'
                 
-                echo '새로운 웹 서버 실행...'
-                // -v 옵션 부분을 아래와 같이 '현재 작업 폴더'를 명확히 가리키도록 수정합니다.
-                sh "docker run -d --name my-web-server -p 8081:80 -v ${WORKSPACE}:/usr/share/nginx/html nginx"
+                echo '2. 깨끗한 Nginx 서버 실행'
+                sh 'docker run -d --name my-web-server -p 8081:80 nginx'
+                
+                echo '3. 정훈님이 만든 index.html을 서버 안으로 강제 복사'
+                // 이 방식은 권한 문제를 원천 차단합니다.
+                sh 'docker cp index.html my-web-server:/usr/share/nginx/html/index.html'
+                
+                echo '4. 서버 권한 정리'
+                sh 'docker exec my-web-server chmod 644 /usr/share/nginx/html/index.html'
             }
         }
         stage('Step 3: 배포 완료 확인') {
