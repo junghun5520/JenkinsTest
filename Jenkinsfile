@@ -1,5 +1,9 @@
 pipeline {
     agent any
+    environment {
+        LANG = 'C.UTF-8'
+        LC_ALL = 'C.UTF-8'
+    }
     stages {
         stage('Step 1: 소스 가져오기') {
             steps {
@@ -26,6 +30,25 @@ pipeline {
             steps {
                 echo '웹 서버가 성공적으로 실행되었습니다!'
                 echo '브라우저에서 http://localhost:8081 에 접속해보세요.'
+            }
+        }
+    }
+}
+pipeline {
+    agent any
+    // 환경 변수에 한글 설정(UTF-8)을 강제로 주입합니다.
+    environment {
+        LANG = 'C.UTF-8'
+        LC_ALL = 'C.UTF-8'
+    }
+    stages {
+        // ... (이전과 동일한 단계들)
+        stage('Step 2: 웹 서버 실행 (Docker)') {
+            steps {
+                sh 'docker rm -f my-web-server || true'
+                sh 'docker run -d --name my-web-server -p 8081:80 nginx'
+                // 복사할 때 한글이 안 깨지도록 경로와 파일을 명확히 지정
+                sh 'docker cp index.html my-web-server:/usr/share/nginx/html/index.html'
             }
         }
     }
